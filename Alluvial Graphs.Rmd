@@ -1,0 +1,75 @@
+---
+title: "Alluvial Plots in R"
+output: html_document
+date: "2023-10-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Hello and welcome to the GG Alluvial Cheatsheet/markdown file for Rhys. SO, welcome Rhys! In case you forgotten how to modify this data, we'll help you out here
+
+So, a lot of this information is taken from: https://cheatography.com/seleven/cheat-sheets/ggalluvial/ so if you wanna just read that, that's ok, but trust me this stuff is also pretty good as it will show more. 
+The ggalluvial package is a ggplot2 extension for producing alluvial plots. In case you need to remember what an Alluvial plot is: 
+Alluvial plots use variable-width ribbons and stacked bar plots to represent multi-dimensional or repeated measures data with categorical or ordinal variables
+Two types - Alluvial (Wide) Format & Lodes (Long) Format. 
+
+There are five essential components to this package: 
+1.AXIS: A dimension (variable) align which the data are vertically grouped at a fixed horizontal position
+2.ALLUVIUM: Horizontal (x-) lines called alluvia span the width of the plot
+3.STRATUM: The groups at each axis are depicted as opaque blocks called strata (columns)
+4.LODE: The alluvia insersect the strata at lodes
+5.FLOW: The segments of the alluvia between pairs of adjacent axes are flows
+
+```{r}
+#install.packages(c("tidyverse", "ggplot2", "alluvial", "ggalluvial"))
+library(ggplot2)
+library(alluvial)
+library(ggalluvial)
+library(tidyverse)
+
+Alluvial.Plot.Test.1 <- read.csv("~/Desktop/Alluvial Plot Test 1.csv", header = TRUE)
+View(Alluvial.Plot.Test.1)
+
+grouped_data <- Alluvial.Plot.Test.1 %>% 
+  group_by(PbEl04Residue, C2Residue) %>%
+  summarise(Freq = n())
+#ggplot is the main function that renders the plot
+ggplot(as.data.frame(grouped_data), 
+       aes(y = Freq, 
+         axis1 = PbEl04Residue, 
+         axis2 = C2Residue,)) +
+geom_alluvium(aes(fill = PbEl04Residue)) +
+  #geom_stratum receives a dataset of the horizontal 
+  #(x) and vertical (y) positions of the strata of an alluvial plot.
+  #It plots rectangles for these strata (columns) of a provided width
+  geom_stratum(aes(fill = PbEl04Residue)) +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+#The "strat = stratum" argument here references
+#that the text present here is to be based on 
+#stratum (columns) regarding the grouped data data frame
+  ggtitle("Interactions between PbEL04 Residues and C2 Residues") +
+  theme_void()
+
+#HERE'S THE INFORMATION PROBIDED BY THE CHEAT SHEET
+#1. Axis: 
+```
+Basic Alluvial Wide Format: 
+Description:        Example: 
+loadpackages        library(ggalluvial)
+basic ggplot        gg <- ggplot(as.data.frame (UCBAdmissions), aes(y = Freq, axis1 = Gender, axis2 = Dept, axis3 = Admit))
+add alluvium        + geom_alluvium()
+add stratum         + geom_stratum()
+add text            + geom_text(stat = "stratum", aes(label = paste(after_stat(stratum))))
+add title           + ggtitle("YOUR TITLE GOES HERE")
+
+
+Change Colour: 
+Description:                Example: 
+The border of Alluvium      geom_alluvium(color="red")
+the border of the stratum   geom_stratum(color="blue")
+the fill of the alluvium    geom_alluvium(aes(fill=alluvium-variable)) geom_alluvium(aes(fill=stratum-variable)) geom_stratum(aes(fill=stratum-variable))
+
+setting the different fills of alluvium and stratum can help analysts easily analyze the data from different aspects
+
